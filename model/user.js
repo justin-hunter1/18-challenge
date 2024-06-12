@@ -1,4 +1,4 @@
-const { Schema, model, Types } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
 const userSchema = new Schema(
     {
@@ -13,7 +13,7 @@ const userSchema = new Schema(
             required: true,
             unique: true,
             match: [
-                /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+                /^[\w\.\+\*\?\^\$\/,!#&'-=~]+@\w+\.\w{2,6}$/,
                 "Please fill a valid email address",
             ]
         },

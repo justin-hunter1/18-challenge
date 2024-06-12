@@ -1,10 +1,10 @@
 const { connect, connection } = require('mongoose');
 require('dotenv').config();
 
-const uri = process.env.MONGODB_URI;
+const mongoURI = process.env.MONGODB_URI || `mongodb://localhost:${process.env.DB_PORT}/${process.env.DB_NAME}`
 
-// connect(uri) || 
-connect(`mongodb://localhost:${process.env.DB_PORT}/${process.env.DB_NAME}`);
-// connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}`);
+connect(mongoURI)
+.then(() => {console.log(`Connected to MongoDB @ ${mongoURI}`);})
+.catch((err) => {console.error('Connection error: ',err)});
 
 module.exports = connection;

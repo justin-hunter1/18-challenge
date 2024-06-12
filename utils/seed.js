@@ -1,43 +1,35 @@
+require("dotenv").config();
 const connection = require("../config/connection.js");
-const { User, Application } = require("../models");
-const { getRandomName, getRandomApplications } = require("./data.js");
+const { User, Thought } = require("../model/index.js");
+const cleanDB = require("./cleanDB.js");
+const { getThought } = require("./data.js");
+const userData = require("./userData.json");
 
-connection.on("error", (err) => err);
 
 connection.once("open", async () => {
   console.log("connected");
 // Delete the collections if they exist
-  let applicationCheck = await connection.db.listCollections({ name: "applications" }).toArray();
-  if (applicationCheck.length) {
-    await connection.dropCollection("applications");
-  };
+await cleanDB(process.env.DB_NAME);
+// await cleanDB("User", "users");
+
   
-  let userCheck = await connection.db.listCollections({ name: "users" }).toArray();
-  if (userCheck.length) {
-    await connection.dropCollection("users");
-  };
+  const users = await User.insertMany(userData);
+  // for (let i = 0; i < users.length; i++) {
+  //   const friends = users._id;
+  //   const user = new User({ username, email, friends });
+  //   await user.save();
+  // }
 
-  const users = [];
-  const applications = getRandomApplications(10);
+  const thoughts = [];
+  for (let i = 0; i < users.length; i++) {
+    const username = users[Math.floor(Math.random() * users.length)];
+    const thoughtText = getThought();
+    const thought = new Thought({ username, thoughtText });
+    await thought.save();
+    thoughts.push(thought);
+  }
 
-  for (let i = 0; i < 20; i++) {
-    const fullName = getRandomName();
-    const first = fullName.split(" ")[0];
-    const last = fullName.split(" ")[1];
 
-    users.push({
-      first,
-      last,
-      age: Math.floor(Math.random() * (99 - 18 + 1) + 18),
-    });
-  };
-
-  await User.collection.insertMany(users);
-  await Application.collection.insertMany(applications);
-
-// loop through the saved applications, for each application we need to generate a application response and insert the application responses
-  console.table(users);
-  console.table(thoughts);
   console.info("Seeding complete! 🌱");
   process.exit(0);
 });
