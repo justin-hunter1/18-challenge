@@ -76,23 +76,12 @@ module.exports = {
                .json(err);
         }
     },
-// create a new Reaction
-async createReaction(req, res) {
-    try {
-        const thought = await Thought.create(req.body);
-        res.json(thought);
-    }
-    catch (err) {
-        res.status(500)
-           .json(err);
-    }
-},
 
 // Update a Reaction
 async updateReaction(req, res) {
     try {
         const thought = await Thought.findOneAndUpdate(
-            { _id: req.params.thoughtId }, { $set: req.body });
+            { _id: req.params.thoughtId }, { $addToSet: { reactions: req.body} });
         if (!thought) {
             return res.status(404)
                       .json({ message: "No thought found" });
@@ -108,7 +97,8 @@ async updateReaction(req, res) {
 // Delete a Reaction
 async deleteReaction(req, res) {
     try {
-        const thought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
+        const thought = await Thought.findOneAndDelete(
+            { _id: req.params.thoughtId }, { $pull: { reactions: { reactionId: req.params.reactionId} } });
         if (!thought) {
             return res.status(404)
                       .json({ message: "No thought found" });
