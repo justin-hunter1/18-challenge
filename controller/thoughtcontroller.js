@@ -75,5 +75,49 @@ module.exports = {
             res.status(500)
                .json(err);
         }
+    },
+// create a new Reaction
+async createReaction(req, res) {
+    try {
+        const thought = await Thought.create(req.body);
+        res.json(thought);
     }
+    catch (err) {
+        res.status(500)
+           .json(err);
+    }
+},
+
+// Update a Reaction
+async updateReaction(req, res) {
+    try {
+        const thought = await Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId }, { $set: req.body });
+        if (!thought) {
+            return res.status(404)
+                      .json({ message: "No thought found" });
+        }
+        res.json(thought);
+    }
+    catch (err) {
+        res.status(500)
+           .json(err);
+    }
+},
+
+// Delete a Reaction
+async deleteReaction(req, res) {
+    try {
+        const thought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
+        if (!thought) {
+            return res.status(404)
+                      .json({ message: "No thought found" });
+        }
+        res.json(thought);
+    }
+    catch (err) {
+        res.status(500)
+           .json(err);
+    }
+}
 };
